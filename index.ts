@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
-import { VideoService } from './services/implementations/VideoService';
-import { PrismaVideoRepository } from './repositories/implementations/PrismaVideoRepository';
 import Connection, { ConnectionOptions } from 'rabbitmq-client';
-import { UploadRouterRabbit } from './routes/UploadRouterRabbit';
-import { AzureUploadService } from './services/implementations/AzureUploadService';
+import { VideoFileRouterRabbit } from './routes/VideoFileRouterRabbit';
+import { AzureService } from './services/implementations/AzureService';
+import { VideoFileService } from './services/implementations/VideoFileService';
+import { PrismaVideoFileRepository } from './repositories/PrismaVideoFileRepository';
 
 //For env File 
 dotenv.config();
@@ -20,5 +20,5 @@ rabbit.on('error', (err) => {
 rabbit.on('connection', () => {
   console.log('Connection successfully (re)established')
 })
-const uploadRouterRabbit = new UploadRouterRabbit(rabbit, new AzureUploadService());
+const uploadRouterRabbit = new VideoFileRouterRabbit(rabbit, new AzureService(), new VideoFileService(new PrismaVideoFileRepository()));
 uploadRouterRabbit.start();
