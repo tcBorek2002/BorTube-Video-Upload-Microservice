@@ -3,7 +3,7 @@ import { BlobSASPermissions, BlobServiceClient, StorageSharedKeyCredential, gene
 
 export class AzureUploadService implements IUploadService {
     constructor() { }
-    getUploadUrl(videoId: string, fileName: string): string {
+    getUploadUrl(blobName: string): string {
         const azureStorageConnectionString = process.env.AZURESTORAGECONNECTIONSTRING;
         const azureStorageKey = process.env.AZURESTORAGEKEY;
         const azureStorageAccount = "storagebortube";
@@ -19,7 +19,6 @@ export class AzureUploadService implements IUploadService {
 
         const sharedKeyCredential = new StorageSharedKeyCredential(azureStorageAccount, azureStorageKey);
         const client = blobServiceClient.getContainerClient(containerName)
-        const blobName = videoId + "_" + fileName;
         const blobClient = client.getBlobClient(blobName);
 
         const blobSAS = generateBlobSASQueryParameters({

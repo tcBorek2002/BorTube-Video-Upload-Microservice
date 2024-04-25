@@ -27,14 +27,14 @@ export class UploadRouterRabbit {
             async (req, reply) => {
                 console.log('Get upload url request:', req.body);
                 if (req.body == null) {
-                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'VideoID and Filename are required.')));
+                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'blobName is required.')));
                 }
-                const { videoId, fileName } = req.body;
-                if (!videoId || !fileName) {
-                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'VideoID and Filename are required.')));
+                const { blobName } = req.body;
+                if (!blobName) {
+                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'blobName is required.')));
                 }
                 try {
-                    const url = this.uploadService.getUploadUrl(videoId, fileName);
+                    const url = this.uploadService.getUploadUrl(blobName);
                     rabbitReply(reply, new ResponseDto<{ url: string }>(true, { url }));
                 }
                 catch (error) {
