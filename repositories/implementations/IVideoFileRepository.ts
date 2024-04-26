@@ -4,4 +4,5 @@ export interface IVideoFileRepository {
     findVideoFileByID(id: number): Promise<VideoFile | null>;
     deleteVideoFileByID(id: number): Promise<VideoFile>;
     createVideoFile(videoId: number, duration: number): Promise<VideoFile>;
+    updateVideoFile(id: number, duration?: number, videoUrl?: string): Promise<VideoFile>;
 }

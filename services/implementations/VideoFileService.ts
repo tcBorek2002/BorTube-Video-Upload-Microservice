@@ -4,6 +4,10 @@ import { VideoFile } from "@prisma/client";
 
 export class VideoFileService implements IVideoFileService {
     constructor(private videoFileRepository: IVideoFileRepository,) { }
+
+    async updateVideoFile(id: number, duration?: number | undefined, videoUr?: string | undefined): Promise<VideoFile> {
+        return await this.videoFileRepository.updateVideoFile(id, duration, videoUr);
+    }
     async getVideoFileById(id: number): Promise<VideoFile | null> {
         return await this.videoFileRepository.findVideoFileByID(id);
     }

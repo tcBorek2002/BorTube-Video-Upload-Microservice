@@ -63,8 +63,6 @@ export class VideoFileRouterRabbit {
                     return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'blobName is required.')));
                 }
                 try {
-                    // const videoUrl = "https://storagebortube.blob.core.windows.net/bortube-container/" + blobName;
-
                     const videoFile = await this.videoFileService.createVideoFile(duration, videoId);
                     rabbitReply(reply, new ResponseDto<VideoFile>(true, videoFile));
                 }
@@ -84,22 +82,23 @@ export class VideoFileRouterRabbit {
                 console.log('Check-upload-state request:', req.body);
 
                 if (req.body == null) {
-                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'videoId is required.')));
+                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'videoId, videoFileId and fileName are required.')));
                 }
-                const { videoId } = req.body;
-                if (!videoId) {
-                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'videoId is required.')));
+                const { videoId, videoFileId, fileName } = req.body;
+                if (!videoId || !videoFileId || !fileName) {
+                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'videoId, videoFileId and fileName are required.')));
                 }
 
                 let uploaded = await this.cloudService.checkUploadState(videoId);
                 if (uploaded) {
-                    // const video = await this.videoFileService.createVideoFile();
-                    // Update the videoFIle here!
+                    const blobName = videoId + "_" + fileName;
+                    const videoUrl = "https://storagebortube.blob.core.windows.net/bortube-container/" + blobName;
+                    await this.videoFileService.updateVideoFile(videoFileId, undefined, videoUrl);
+                    rabbitReply(reply, new ResponseDto<{ uploadState: boolean }>(true, { uploadState: uploaded }));
                 }
                 else {
                     return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(404, 'VideoNotFound', 'The video was not uploaded.')));
                 }
-                rabbitReply(reply, new ResponseDto<{ uploadState: boolean }>(true, { uploadState: uploaded }));
             }
         );
 
