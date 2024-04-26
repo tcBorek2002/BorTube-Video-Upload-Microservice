@@ -1,18 +1,18 @@
+import { VideoFile } from "@prisma/client";
 import prisma from "../client";
 import { IVideoFileRepository } from "./implementations/IVideoFileRepository";
 
 export class PrismaVideoFileRepository implements IVideoFileRepository {
-    async findVideoFileByID(id: number): Promise<{ id: number; duration: number; videoUrl: string; } | null> {
+    async findVideoFileByID(id: number): Promise<VideoFile | null> {
         return await prisma.videoFile.findUnique({ where: { id } });
     }
-    async deleteVideoFileByID(id: number): Promise<{ id: number; duration: number; videoUrl: string; }> {
+    async deleteVideoFileByID(id: number): Promise<VideoFile> {
         return await prisma.videoFile.delete({ where: { id } });
     }
-    async createVideoFile(videoId: number, duration: number, videoUrl: string): Promise<{ id: number; duration: number; videoUrl: string; }> {
+    async createVideoFile(videoId: number, duration: number): Promise<VideoFile> {
         return await prisma.videoFile.create({
             data: {
                 duration,
-                videoUrl,
                 video: {
                     connect: {
                         id: videoId,

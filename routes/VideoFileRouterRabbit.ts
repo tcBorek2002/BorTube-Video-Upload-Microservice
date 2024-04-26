@@ -37,7 +37,36 @@ export class VideoFileRouterRabbit {
                 }
                 try {
                     const url = this.cloudService.getUploadUrl(blobName);
+                    const videoUrl = "https://storagebortube.blob.core.windows.net/bortube-container/" + blobName;
+
                     rabbitReply(reply, new ResponseDto<{ url: string }>(true, { url }));
+                }
+                catch (error) {
+                    console.error(error);
+                    rabbitReply(reply, new ResponseDto(false, new ErrorDto(500, 'InternalServerError', 'An error occurred while generating the upload URL.' + error)));
+                }
+
+            }
+        );
+
+        const createVideoFile = this.rabbit.createConsumer(
+            {
+                queue: 'create-video-file',
+            },
+            async (req, reply) => {
+                console.log('Create video-file request:', req.body);
+                if (req.body == null) {
+                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'blobName is required.')));
+                }
+                const { blobName, duration, videoId } = req.body;
+                if (!blobName || !duration || !Number.isInteger(duration)) {
+                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(400, 'InvalidInputError', 'blobName is required.')));
+                }
+                try {
+                    // const videoUrl = "https://storagebortube.blob.core.windows.net/bortube-container/" + blobName;
+
+                    const videoFile = await this.videoFileService.createVideoFile(duration, videoId);
+                    rabbitReply(reply, new ResponseDto<VideoFile>(true, videoFile));
                 }
                 catch (error) {
                     console.error(error);
@@ -63,6 +92,13 @@ export class VideoFileRouterRabbit {
                 }
 
                 let uploaded = await this.cloudService.checkUploadState(videoId);
+                if (uploaded) {
+                    // const video = await this.videoFileService.createVideoFile();
+                    // Update the videoFIle here!
+                }
+                else {
+                    return await rabbitReply(reply, new ResponseDto(false, new ErrorDto(404, 'VideoNotFound', 'The video was not uploaded.')));
+                }
                 rabbitReply(reply, new ResponseDto<{ uploadState: boolean }>(true, { uploadState: uploaded }));
             }
         );
@@ -102,6 +138,7 @@ export class VideoFileRouterRabbit {
                 getUploadUrl.close(),
                 checkUploadState.close(),
                 deleteVideoFile.close(),
+                createVideoFile.close()
             ]);
             await this.rabbit.close();
         });
