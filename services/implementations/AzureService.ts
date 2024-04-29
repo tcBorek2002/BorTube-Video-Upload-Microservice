@@ -68,7 +68,7 @@ export class AzureService implements ICloudService {
             containerName,
             blobName,
             permissions: BlobSASPermissions.parse("wt"),
-            startsOn: new Date(),
+            startsOn: new Date(Date.now() - 2000), // 2 seconds before now
             expiresOn: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
         },
             sharedKeyCredential
