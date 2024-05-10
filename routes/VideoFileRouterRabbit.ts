@@ -125,6 +125,9 @@ export class VideoFileRouterRabbit {
                 });
 
                 if (deleted) {
+                    if (deleted.videoUrl) {
+                        await this.cloudService.deleteVideoCloud(deleted.videoUrl);
+                    }
                     rabbitReply(reply, new ResponseDto<{ deleteVideoFile: VideoFile }>(true, { deleteVideoFile: deleted }));
                 } else {
                     rabbitReply(reply, new ResponseDto(false, new ErrorDto(500, 'InternalServerError', 'An error occurred while deleting the video file.')));

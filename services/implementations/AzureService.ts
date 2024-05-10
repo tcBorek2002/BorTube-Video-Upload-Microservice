@@ -26,7 +26,7 @@ export class AzureService implements ICloudService {
         }
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-        await blockBlobClient.deleteIfExists(options);
+        let response = await blockBlobClient.deleteIfExists(options);
     }
 
     async checkUploadState(videoId: string): Promise<boolean> {
