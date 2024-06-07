@@ -29,5 +29,26 @@ spec:
         - image: bortubecontainers.azurecr.io/bortube/video-uploading-microservice:latest
           name: bortube-video-uploading-microservice-container
           resources: {}
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: DATABASE_URL
+                  name: uploading-secret
+            - name: AZURESTORAGECONNECTIONSTRING
+              valueFrom:
+                secretKeyRef:
+                  key: AZURESTORAGECONNECTIONSTRING
+                  name: uploading-secret
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: RABBITMQ_PASSWORD
+                  name: uploading-secret
+            - name: RABBITMQ_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  key: RABBITMQ_HOSTNAME
+                  name: uploading-secret
       restartPolicy: Always
 status: {}
